@@ -1,19 +1,12 @@
-<<<<<<< HEAD
 # Editor backup files:
 *~
 .*.swp
 build*/
-
 # Build output
 *.o
 *.a
 *.so
-
 # OS/X File system droppings
 *.DS_Store
-
 # Sublime Test temp files
 ._*
-=======
-build/*
->>>>>>> add .gitignore
