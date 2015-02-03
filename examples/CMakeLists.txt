@@ -1,5 +1,6 @@
 # examples/CMakeLists.txt
 
+
 add_executable(example1 example1.cpp)
 target_link_libraries(example1 gpstk)
 
@@ -51,6 +52,8 @@ target_link_libraries(example15 gpstk)
 
 add_executable(example18 example18.cpp)
 target_link_libraries(example18 gpstk)
+
+add_subdirectory(rinex)
 
 
 

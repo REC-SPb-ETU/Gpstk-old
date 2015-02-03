@@ -941,5 +941,4 @@ namespace gpstk
       }
       return rv;
    } // bool Rinex3NavHeader::compare
-
 } // namespace
