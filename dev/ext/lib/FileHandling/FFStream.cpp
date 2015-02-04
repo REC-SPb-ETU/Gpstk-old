@@ -52,6 +52,13 @@ namespace gpstk
   {
   }
 
+  FFStream::FFStream(std::basic_iostream<char>& anotherStream)
+  {
+    rdbuf(anotherStream.rdbuf());
+    recordNumber = 0;
+    clear();
+  }
+
   FFStream::FFStream(const char* fn, std::ios::openmode mode)
   {
     open(fn, mode);
@@ -330,7 +337,7 @@ namespace gpstk
 
   bool FFStream::is_open()
   {
-    if(fileStream)
+    if (fileStream)
       return fileStream.is_open();
     return true;
   }

@@ -74,7 +74,10 @@ namespace gpstk
       FFTextStream()
             : lineNumber(0) {};
 
-
+            
+      FFTextStream(std::basic_iostream<char>& anotherStream)
+      : FFStream(anotherStream), lineNumber(0)
+      {};
          /** Common constructor.
           *
           * @param fn file name.

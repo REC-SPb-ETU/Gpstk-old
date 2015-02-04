@@ -68,6 +68,9 @@ namespace gpstk
             : headerRead(false)
          {}
       
+      Rinex3NavStream(std::basic_iostream<char>& anotherStream) 
+            : FFTextStream(anotherStream), headerRead(false) {}
+            
          /** Constructor 
           * Opens a file named \a fn using ios::openmode \a mode.
           */

@@ -127,8 +127,13 @@ namespace gpstk
          /**
           * Default constructor
           */
-      FFStream();;
-
+      FFStream();
+      
+         /** Construction from another stream for decoration
+          *
+          * @param anotherStream
+          */
+      FFStream(std::basic_iostream<char>& anotherStream);
 
          /** Common constructor.
           *
@@ -143,7 +148,7 @@ namespace gpstk
           * @param fn file name.
           * @param mode file open mode (std::ios)
           */
-      FFStream( const std::string& fn, std::ios::openmode mode=std::ios::in );;
+      FFStream( const std::string& fn, std::ios::openmode mode=std::ios::in );
 
 
          /**
