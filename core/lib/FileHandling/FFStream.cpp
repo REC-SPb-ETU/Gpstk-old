@@ -41,6 +41,7 @@
 
 #include "FFStream.hpp"
 
+
 namespace gpstk
 {
    FFStream ::
@@ -49,6 +50,13 @@ namespace gpstk
    {
    }
 
+   FFStream ::
+   FFStream(std::basic_iostream<char>& anotherStream)
+   {
+      this->init(anotherStream.rdbuf());
+      recordNumber = 0;
+      clear();
+   }
 
    FFStream ::
    ~FFStream()
@@ -94,19 +102,20 @@ namespace gpstk
    }
 
 
-   void FFStream ::
-   open( const char* fn, std::ios::openmode mode )
-   {
-         // Child classes should never do anything more in open() than
-         // call a class-specific init function and the parent open()
-         // method.  In this case we are calling init() first because
-         // it closes the stream if it's already open, which obviously
-         // shouldn't be done AFTER the new stream is open.  Child
-         // classes typically will want to do their initialization
-         // AFTER the parent.
-      init(fn, mode);
-      std::fstream::open(fn, mode);
-   }  // End of method 'FFStream::open()'
+  /*
+   * Overrides fstream:open so derived classes can make appropriate
+   * internal changes (line count, header info, etc).
+   */
+  void FFStream ::
+  open( const char* fn, std::ios::openmode mode )
+  {
+    filename = std::string(fn);
+    recordNumber = 0;
+    fileStream.open(fn, mode);
+    rdbuf(fileStream.rdbuf());
+    clear();
+
+  }  // End of method 'FFStream::open()'
 
 
    void FFStream ::
@@ -119,6 +128,7 @@ namespace gpstk
    }  // End of method 'FFStream::open()'
 
 
+  // A function to help debug FFStreams
    bool FFStream ::
    isFFStream(std::istream& i)
    {
@@ -155,6 +165,8 @@ namespace gpstk
       if (rdstate() == 0)  s << "none";
       s << std::endl;
    }  // End of method 'FFStream::dumpState()'
+
+
 
 
    void FFStream::tryFFStreamGet(FFData& rec)
@@ -377,6 +389,17 @@ namespace gpstk
 
    }  // End of method 'FFStream::tryFFStreamPut()'
 
+   void FFStream::close()
+   {
+     if (fileStream && fileStream.is_open())
+       fileStream.close();
+   }
 
+   bool FFStream::is_open()
+   {
+     if(fileStream)
+       return fileStream.is_open();
+     return true;
+   }
 
 }  // End of namespace gpstk

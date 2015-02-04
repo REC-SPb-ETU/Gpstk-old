@@ -45,6 +45,7 @@
 
 #include <iostream>
 #include <fstream>
+#include <istream>
 #include <string>
 #include <typeinfo>
 
@@ -118,7 +119,7 @@ namespace gpstk
        * @warning When using open(), the internal header data of the stream
        * is not guaranteed to be retained.
        */
-   class FFStream : public std::fstream
+   class FFStream : public std::basic_iostream<char>
    {
    public:
          /// Default constructor, initialize internal data
@@ -126,6 +127,12 @@ namespace gpstk
 
          /// Virtual destructor, close the stream etc.
       virtual ~FFStream();
+      
+         /** Construction from another stream for decoration
+	  *
+	  * @param anotherStream
+	  */
+      FFStream(std::basic_iostream<char>& anotherStream);
 
          /** Common constructor.
           *
@@ -169,6 +176,9 @@ namespace gpstk
 
          /// Check if the input stream is the kind of RinexObsStream
       static bool isFFStream(std::istream& i);
+      
+      virtual void close();
+      virtual bool is_open();
 
          ///@name Data members
          ///@{
@@ -182,14 +192,17 @@ namespace gpstk
       std::string filename;
 
          //@}
-
+      
+      
 
          /// FFData is a friend so it can access the try* functions.
       friend class FFData;
 
 
    protected:
-
+     
+      std::fstream fileStream; // used only in file system case;
+      
 
          /// Encapsulates shared try/catch blocks for all file types
          /// to hide std::exception.
