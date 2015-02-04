@@ -43,265 +43,299 @@
 
 #include "FFStream.hpp"
 
+
 namespace gpstk
 {
 
-      /*
-       * Overrides fstream:open so derived classes can make appropriate
-       * internal changes (line count, header info, etc).
-       */
-   void FFStream::open( const char* fn, std::ios::openmode mode )
-   {
-      std::fstream::open(fn, mode);
+  FFStream::FFStream()
+  : recordNumber(0)
+  {
+  }
 
-      filename = std::string(fn);
-      recordNumber = 0;
-      clear();
+  FFStream::FFStream(const char* fn, std::ios::openmode mode)
+  {
+    open(fn, mode);
+  }
 
-   }  // End of method 'FFStream::open()'
+  FFStream::FFStream(const std::string& fn, std::ios::openmode mode)
+  {
+    open(fn.c_str(), mode);
+  }
 
+  /*
+   * Overrides fstream:open so derived classes can make appropriate
+   * internal changes (line count, header info, etc).
+   */
+  void FFStream::open( const char* fn, std::ios::openmode mode )
+  {
+    filename = std::string(fn);
+    recordNumber = 0;
+    fileStream.open(fn, mode);
+    rdbuf(fileStream.rdbuf());
+    clear();
 
-
-      // A function to help debug FFStreams
-   void FFStream::dumpState(std::ostream& s) const
-   {
-
-      s << "filename:" << filename
-        << ", recordNumber:" << recordNumber;
-      s << ", exceptions:";
-
-      if (exceptions() & std::ios::badbit)  s << "bad ";
-      if (exceptions() & std::ios::failbit) s << "fail ";
-      if (exceptions() & std::ios::eofbit)  s << "eof ";
-      if (exceptions() == 0) s << "none";
-
-      s << ", rdstate:";
-
-      if (rdstate() & std::ios::badbit)  s << "bad ";
-      if (rdstate() & std::ios::failbit) s << "fail ";
-      if (rdstate() & std::ios::eofbit)  s << "eof ";
-      if (rdstate() == 0)  s << "none";
-      s << std::endl;
-
-   }  // End of method 'FFStream::dumpState()'
+  }  // End of method 'FFStream::open()'
 
 
 
-      // the crazy double try block is so that no gpstk::Exception throws
-      // get masked, allowing all exception information (line numbers, text,
-      // etc) to be retained.
-   void FFStream::tryFFStreamGet(FFData& rec)
-      throw(FFStreamError, gpstk::StringUtils::StringException)
-   {
+  // A function to help debug FFStreams
 
-         // Mark where we start in case there is an error.
-      long initialPosition = tellg();
-      unsigned long initialRecordNumber = recordNumber;
-      clear();
+  void FFStream::dumpState(std::ostream& s) const
+  {
 
+    s << "filename:" << filename
+            << ", recordNumber:" << recordNumber;
+    s << ", exceptions:";
+
+    if (exceptions() & std::ios::badbit)  s << "bad ";
+    if (exceptions() & std::ios::failbit) s << "fail ";
+    if (exceptions() & std::ios::eofbit)  s << "eof ";
+    if (exceptions() == 0) s << "none";
+
+    s << ", rdstate:";
+
+    if (rdstate() & std::ios::badbit)  s << "bad ";
+    if (rdstate() & std::ios::failbit) s << "fail ";
+    if (rdstate() & std::ios::eofbit)  s << "eof ";
+    if (rdstate() == 0)  s << "none";
+    s << std::endl;
+
+  }  // End of method 'FFStream::dumpState()'
+
+
+
+  // the crazy double try block is so that no gpstk::Exception throws
+  // get masked, allowing all exception information (line numbers, text,
+  // etc) to be retained.
+
+  void FFStream::tryFFStreamGet(FFData& rec)
+  throw (FFStreamError, gpstk::StringUtils::StringException)
+  {
+
+    // Mark where we start in case there is an error.
+    long initialPosition = tellg();
+    unsigned long initialRecordNumber = recordNumber;
+    clear();
+
+    try
+    {
       try
       {
-         try
-         {
-            rec.reallyGetRecord(*this);
-            recordNumber++;
-         }
-         catch (EndOfFile& e)
-         {
-            // EOF - do nothing - eof causes fail() to be set which
-            // is handled by std::fstream
-            e.addText("In record " +
-               gpstk::StringUtils::asString(recordNumber));
-            e.addText("In file " + filename);
-            e.addLocation(FILE_LOCATION);
-            mostRecentException = e;
-         }
-         catch (std::exception &e)
-         {
-            mostRecentException = FFStreamError("std::exception thrown: " +
-                                                std::string(e.what()));
-            mostRecentException.addText("In record " +
-                  gpstk::StringUtils::asString(recordNumber));
-            mostRecentException.addText("In file " + filename);
-            mostRecentException.addLocation(FILE_LOCATION);
-            clear();
-            seekg(initialPosition);
-            recordNumber = initialRecordNumber;
-            setstate(std::ios::failbit);
-            conditionalThrow();
-         }
-         catch (gpstk::StringUtils::StringException& e)
-         {
-            e.addText("In record " +
-                      gpstk::StringUtils::asString(recordNumber));
-            e.addText("In file " + filename);
-            e.addLocation(FILE_LOCATION);
-            mostRecentException = e;
-            clear();
-            seekg(initialPosition);
-            recordNumber = initialRecordNumber;
-            setstate(std::ios::failbit);
-            conditionalThrow();
-         }
-            // catches some errors we can encounter
-         catch (FFStreamError& e)
-         {
-            e.addText("In record " +
-                      gpstk::StringUtils::asString(recordNumber));
-            e.addText("In file " + filename);
-            e.addLocation(FILE_LOCATION);
-            mostRecentException = e;
-            clear();
-            seekg(initialPosition);
-            recordNumber = initialRecordNumber;
-            setstate(std::ios::failbit);
-            conditionalThrow();
-         }
+        rec.reallyGetRecord(*this);
+        recordNumber++;
       }
-         // this is if you throw an FFStream error in the above catch
-         // block because the catch(...) below will mask it otherwise.
-         // This also takes care of catching StringExceptions
-      catch (gpstk::Exception &e)
+      catch (EndOfFile& e)
       {
-         GPSTK_RETHROW(e);
-      }
-      catch (std::ifstream::failure &e)
-      {
-            // setting failbit when catching FFStreamError can cause
-            // this exception to be thrown. in this case, we don't want
-            // to lose the exception info so only make a new exception
-            // if this isn't a fail() case
-         if (!fail())
-         {
-            mostRecentException = FFStreamError("ifstream::failure thrown: " +
-                                                std::string(e.what()));
-            mostRecentException.addText("In file " + filename);
-            mostRecentException.addLocation(FILE_LOCATION);
-         }
-         conditionalThrow();
+        // EOF - do nothing - eof causes fail() to be set which
+        // is handled by std::fstream
+        e.addText("In record " +
+                gpstk::StringUtils::asString(recordNumber));
+        e.addText("In file " + filename);
+        e.addLocation(FILE_LOCATION);
+        mostRecentException = e;
       }
       catch (std::exception &e)
       {
-         mostRecentException = FFStreamError("std::exception thrown: " +
-                                             std::string(e.what()));
-         mostRecentException.addText("In file " + filename);
-         mostRecentException.addLocation(FILE_LOCATION);
-         setstate(std::ios::failbit);
-         conditionalThrow();
+        mostRecentException = FFStreamError("std::exception thrown: " +
+                std::string(e.what()));
+        mostRecentException.addText("In record " +
+                gpstk::StringUtils::asString(recordNumber));
+        mostRecentException.addText("In file " + filename);
+        mostRecentException.addLocation(FILE_LOCATION);
+        clear();
+        seekg(initialPosition);
+        recordNumber = initialRecordNumber;
+        setstate(std::ios::failbit);
+        conditionalThrow();
       }
-      catch (...)
+      catch (gpstk::StringUtils::StringException& e)
       {
-         mostRecentException = FFStreamError("Unknown exception thrown");
-         mostRecentException.addText("In file " + filename);
-         mostRecentException.addLocation(FILE_LOCATION);
-         setstate(std::ios::failbit);
-         conditionalThrow();
+        e.addText("In record " +
+                gpstk::StringUtils::asString(recordNumber));
+        e.addText("In file " + filename);
+        e.addLocation(FILE_LOCATION);
+        mostRecentException = e;
+        clear();
+        seekg(initialPosition);
+        recordNumber = initialRecordNumber;
+        setstate(std::ios::failbit);
+        conditionalThrow();
       }
+      // catches some errors we can encounter
+      catch (FFStreamError& e)
+      {
+        e.addText("In record " +
+                gpstk::StringUtils::asString(recordNumber));
+        e.addText("In file " + filename);
+        e.addLocation(FILE_LOCATION);
+        mostRecentException = e;
+        clear();
+        seekg(initialPosition);
+        recordNumber = initialRecordNumber;
+        setstate(std::ios::failbit);
+        conditionalThrow();
+      }
+    }
+    // this is if you throw an FFStream error in the above catch
+    // block because the catch(...) below will mask it otherwise.
+    // This also takes care of catching StringExceptions
+    catch (gpstk::Exception &e)
+    {
+      GPSTK_RETHROW(e);
+    }
+    catch (std::ifstream::failure &e)
+    {
+      // setting failbit when catching FFStreamError can cause
+      // this exception to be thrown. in this case, we don't want
+      // to lose the exception info so only make a new exception
+      // if this isn't a fail() case
+      if (!fail())
+      {
+        mostRecentException = FFStreamError("ifstream::failure thrown: " +
+                std::string(e.what()));
+        mostRecentException.addText("In file " + filename);
+        mostRecentException.addLocation(FILE_LOCATION);
+      }
+      conditionalThrow();
+    }
+    catch (std::exception &e)
+    {
+      mostRecentException = FFStreamError("std::exception thrown: " +
+              std::string(e.what()));
+      mostRecentException.addText("In file " + filename);
+      mostRecentException.addLocation(FILE_LOCATION);
+      setstate(std::ios::failbit);
+      conditionalThrow();
+    }
+    catch (...)
+    {
+      mostRecentException = FFStreamError("Unknown exception thrown");
+      mostRecentException.addText("In file " + filename);
+      mostRecentException.addLocation(FILE_LOCATION);
+      setstate(std::ios::failbit);
+      conditionalThrow();
+    }
 
-   }  // End of method 'FFStream::tryFFStreamGet()'
+  }  // End of method 'FFStream::tryFFStreamGet()'
 
 
 
-      // the crazy double try block is so that no gpstk::Exception throws 
-      // get masked, allowing all exception information (line numbers, text,
-      // etc) to be retained.
-   void FFStream::tryFFStreamPut(const FFData& rec)
-      throw(FFStreamError, gpstk::StringUtils::StringException)
-   {
-         // Mark where we start in case there is an error.
-      long initialPosition = tellg();
-      unsigned long initialRecordNumber = recordNumber;
-      clear();
+  // the crazy double try block is so that no gpstk::Exception throws 
+  // get masked, allowing all exception information (line numbers, text,
+  // etc) to be retained.
 
+  void FFStream::tryFFStreamPut(const FFData& rec)
+  throw (FFStreamError, gpstk::StringUtils::StringException)
+  {
+    // Mark where we start in case there is an error.
+    long initialPosition = tellg();
+    unsigned long initialRecordNumber = recordNumber;
+    clear();
+
+    try
+    {
       try
       {
-         try
-         {
-            rec.reallyPutRecord(*this);
-            recordNumber++;
-         }
-         catch (std::exception &e)
-         {
-               // if this is a stream failure, don't mask it and let the
-               // later catch block handle it
-            if (dynamic_cast<std::ifstream::failure*>(&e))
-               throw;
-
-               // the catch(FFStreamError) below will add file information
-               // to this exception
-            mostRecentException = FFStreamError("std::exception thrown: " +
-                                                std::string(e.what()));
-            mostRecentException.addLocation(FILE_LOCATION);
-            setstate(std::ios::failbit);
-            conditionalThrow();
-         }
-         catch (gpstk::StringUtils::StringException& e)  
-         {
-            e.addText("In record " +
-                      gpstk::StringUtils::asString(recordNumber));
-            e.addText("In file " + filename);
-            e.addLocation(FILE_LOCATION);
-            mostRecentException = e;
-            seekg(initialPosition);
-            recordNumber = initialRecordNumber;
-            setstate(std::ios::failbit);
-            conditionalThrow();
-         } 
-            // catches some errors we can encounter
-         catch (FFStreamError& e)
-         {
-            e.addText("In record " +
-                      gpstk::StringUtils::asString(recordNumber));
-            e.addText("In file " + filename);
-            e.addLocation(FILE_LOCATION);
-            mostRecentException = e;
-            seekg(initialPosition);
-            recordNumber = initialRecordNumber;
-            setstate(std::ios::failbit);
-            conditionalThrow();
-         }
-      }
-         // this is if you throw an FFStream error in the above catch
-         // block because the catch(...) below will mask it otherwise.
-         // This also takes care of catching StringExceptions
-      catch (gpstk::Exception &e)
-      {
-         GPSTK_RETHROW(e);
-      }
-      catch (std::ifstream::failure &e)
-      {
-            // setting failbit when catching FFStreamError can cause
-            // this exception to be thrown. in this case, we don't want
-            // to lose the exception info so only make a new exception
-            // if this isn't a fail() case
-         if (!fail())
-         {
-            mostRecentException = FFStreamError("ifstream::failure thrown: " +
-                                                std::string(e.what()));
-            mostRecentException.addText("In file " + filename);
-            mostRecentException.addLocation(FILE_LOCATION);
-         }
-         conditionalThrow();
+        rec.reallyPutRecord(*this);
+        recordNumber++;
       }
       catch (std::exception &e)
       {
-         mostRecentException = FFStreamError("std::exception thrown: " +
-                                             std::string(e.what()));
-         mostRecentException.addText("In file " + filename);
-         mostRecentException.addLocation(FILE_LOCATION);
-         setstate(std::ios::failbit);
-         conditionalThrow();
-      }
-      catch (...)
-      {
-         mostRecentException = FFStreamError("Unknown exception thrown");
-         mostRecentException.addText("In file " + filename);
-         mostRecentException.addLocation(FILE_LOCATION);
-         setstate(std::ios::failbit);
-         conditionalThrow();
-      }
+        // if this is a stream failure, don't mask it and let the
+        // later catch block handle it
+        if (dynamic_cast<std::ifstream::failure*> (&e))
+          throw;
 
-   }  // End of method 'FFStream::tryFFStreamPut()'
+        // the catch(FFStreamError) below will add file information
+        // to this exception
+        mostRecentException = FFStreamError("std::exception thrown: " +
+                std::string(e.what()));
+        mostRecentException.addLocation(FILE_LOCATION);
+        setstate(std::ios::failbit);
+        conditionalThrow();
+      }
+      catch (gpstk::StringUtils::StringException& e)
+      {
+        e.addText("In record " +
+                gpstk::StringUtils::asString(recordNumber));
+        e.addText("In file " + filename);
+        e.addLocation(FILE_LOCATION);
+        mostRecentException = e;
+        seekg(initialPosition);
+        recordNumber = initialRecordNumber;
+        setstate(std::ios::failbit);
+        conditionalThrow();
+      }
+      // catches some errors we can encounter
+      catch (FFStreamError& e)
+      {
+        e.addText("In record " +
+                gpstk::StringUtils::asString(recordNumber));
+        e.addText("In file " + filename);
+        e.addLocation(FILE_LOCATION);
+        mostRecentException = e;
+        seekg(initialPosition);
+        recordNumber = initialRecordNumber;
+        setstate(std::ios::failbit);
+        conditionalThrow();
+      }
+    }
+    // this is if you throw an FFStream error in the above catch
+    // block because the catch(...) below will mask it otherwise.
+    // This also takes care of catching StringExceptions
+    catch (gpstk::Exception &e)
+    {
+      GPSTK_RETHROW(e);
+    }
+    catch (std::ifstream::failure &e)
+    {
+      // setting failbit when catching FFStreamError can cause
+      // this exception to be thrown. in this case, we don't want
+      // to lose the exception info so only make a new exception
+      // if this isn't a fail() case
+      if (!fail())
+      {
+        mostRecentException = FFStreamError("ifstream::failure thrown: " +
+                std::string(e.what()));
+        mostRecentException.addText("In file " + filename);
+        mostRecentException.addLocation(FILE_LOCATION);
+      }
+      conditionalThrow();
+    }
+    catch (std::exception &e)
+    {
+      mostRecentException = FFStreamError("std::exception thrown: " +
+              std::string(e.what()));
+      mostRecentException.addText("In file " + filename);
+      mostRecentException.addLocation(FILE_LOCATION);
+      setstate(std::ios::failbit);
+      conditionalThrow();
+    }
+    catch (...)
+    {
+      mostRecentException = FFStreamError("Unknown exception thrown");
+      mostRecentException.addText("In file " + filename);
+      mostRecentException.addLocation(FILE_LOCATION);
+      setstate(std::ios::failbit);
+      conditionalThrow();
+    }
+
+  }  // End of method 'FFStream::tryFFStreamPut()'
+
+  void FFStream::close()
+  {
+    if (fileStream && fileStream.is_open())
+      fileStream.close();
+  }
+
+  bool FFStream::is_open()
+  {
+    if(fileStream)
+      return fileStream.is_open();
+    return true;
+  }
+
+
 
 
 

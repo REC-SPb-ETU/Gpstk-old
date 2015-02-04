@@ -24,7 +24,7 @@ int main(int argc, char *argv[])
   cout << "Header processing...";
   try {
     Rinex3NavHeader rhd;
-    rhd.version = 2.11;
+    rhd.version = 3;
     rhd.fileAgency = "NIC";
     rhd.fileProgram = "gpstk";
     rhd.setFileSystem("G");

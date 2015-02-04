@@ -47,6 +47,7 @@
 
 #include <iostream>
 #include <fstream>
+#include <istream>
 #include <string>
 #include <typeinfo>
 
@@ -115,7 +116,7 @@ namespace gpstk
        * @warning When using open(), the internal header data of the stream
        * is not guaranteed to be retained.
        */
-   class FFStream : public std::fstream
+   class FFStream : public std::basic_iostream<char>
    {
    public:
 
@@ -126,8 +127,7 @@ namespace gpstk
          /**
           * Default constructor
           */
-      FFStream()
-            : recordNumber(0) {};
+      FFStream();;
 
 
          /** Common constructor.
@@ -135,9 +135,7 @@ namespace gpstk
           * @param fn file name.
           * @param mode file open mode (std::ios)
           */
-      FFStream( const char* fn, std::ios::openmode mode=std::ios::in )
-         : std::fstream(fn, mode), recordNumber(0), filename(fn)
-      { clear(); }
+      FFStream( const char* fn, std::ios::openmode mode=std::ios::in );
 
 
          /** Common constructor.
@@ -145,9 +143,7 @@ namespace gpstk
           * @param fn file name.
           * @param mode file open mode (std::ios)
           */
-      FFStream( const std::string& fn, std::ios::openmode mode=std::ios::in )
-         : std::fstream(fn.c_str(), mode), recordNumber(0), filename(fn)
-      { clear(); };
+      FFStream( const std::string& fn, std::ios::openmode mode=std::ios::in );;
 
 
          /**
@@ -203,6 +199,9 @@ namespace gpstk
 
          return true;
       }
+      
+      virtual void close();
+      virtual bool is_open();
 
 
          ///@name Data members
@@ -219,14 +218,17 @@ namespace gpstk
       std::string filename;
 
          //@}
-
+      
+      
 
          /// FFData is a friend so it can access the try* functions.
       friend class FFData;
 
 
    protected:
-
+     
+      std::fstream fileStream; // used only in file system case;
+      
 
          /// Encapsulates shared try/catch blocks for all file types
          /// to hide std::exception.
