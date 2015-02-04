@@ -6,3 +6,6 @@ target_link_libraries(rinex211GpsWrite gpstk)
 
 add_executable(rinex211GlonassWrite rinex211GlonassWrite.cpp)
 target_link_libraries(rinex211GlonassWrite gpstk)
+
+add_executable(rinex211GlonassWriteCout rinex211GlonassWriteCout.cpp)
+target_link_libraries(rinex211GlonassWriteCout gpstk)

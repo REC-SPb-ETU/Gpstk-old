@@ -128,10 +128,15 @@ namespace gpstk
          /// Virtual destructor, close the stream etc.
       virtual ~FFStream();
       
+         /**
+          * Default constructor
+          */
+      FFStream();
+      
          /** Construction from another stream for decoration
-	  *
-	  * @param anotherStream
-	  */
+          *
+          * @param anotherStream
+          */
       FFStream(std::basic_iostream<char>& anotherStream);
 
          /** Common constructor.
