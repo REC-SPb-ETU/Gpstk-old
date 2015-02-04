@@ -69,28 +69,29 @@ namespace gpstk
          {}
 
       /// access the position, ECEF Cartesian in meters
-      Triple getPos() throw()
+      Triple getPos() const throw()
          { return x; }
 
       /// access the velocity in m/s
-      Triple getVel() throw()
+      Triple getVel() const throw()
          { return v; }
 
       /// access the clock bias, in second
-      double getClockBias() throw()
+      double getClockBias() const throw()
          { return clkbias; }
 
       /// access the clock drift, in second/second
-      double getClockDrift() throw()
+      double getClockDrift() const throw()
          { return clkdrift; }
 
       /// access the relativity correction, in seconds
-      double getRelativityCorr() throw()
+      double getRelativityCorr() const throw()
          { return relcorr; }
 
       /// Compute and return the relativity correction (-2R dot V/c^2) in seconds
       /// NB -2*dot(R,V)/(c*c) = -4.4428e-10(s/sqrt(m)) * ecc * sqrt(A(m)) * sinE
       double computeRelativityCorrection(void);
+      double computeRelativityCorrection(void) const;
 
       /// Given the position of a ground location, compute the range
       /// to the spacecraft position.

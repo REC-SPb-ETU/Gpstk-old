@@ -59,9 +59,9 @@ std::ostream& operator<<(std::ostream& os, const gpstk::Xvt& xvt) throw()
 }
 
 // compute the relativity correction
-double Xvt::computeRelativityCorrection(void)
+double gpstk::Xvt::computeRelativityCorrection(void) const
 {
-   relcorr = -2.0*( (x[0]/C_MPS)*(v[0]/C_MPS)
+   double relcorr = -2.0*( (x[0]/C_MPS)*(v[0]/C_MPS)
                    +(x[1]/C_MPS)*(v[1]/C_MPS)
                    +(x[2]/C_MPS)*(v[2]/C_MPS) );
    return relcorr;
