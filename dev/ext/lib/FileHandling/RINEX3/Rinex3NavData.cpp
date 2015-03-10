@@ -145,7 +145,7 @@ namespace gpstk
       HOWtime = gpseph.HOWtime;
       weeknum = static_cast<GPSWeekSecond>(gpseph.transmitTime).getWeek();
 
-      accuracy = gpseph.accuracyFlag;
+      accuracy = gpseph.accuracy;
       health = gpseph.health;
 
       codeflgs = gpseph.codeflags;
@@ -671,7 +671,7 @@ namespace gpstk
       gpse.IODC = IODC;
       gpse.IODE = IODE;
       gpse.health = health;
-      gpse.accuracyFlag = accuracy;
+      gpse.accuracy = accuracy;
       gpse.Tgd = Tgd;
 
       gpse.HOWtime = HOWtime;
