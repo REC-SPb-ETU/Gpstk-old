@@ -71,6 +71,15 @@ namespace gpstk
           * @param[in] fn the RINEX file to open
           * @param[in] mode how to open \a fn.
           */
+            
+      Rinex3ObsStream(std::basic_iostream<char>& anotherStream) 
+      : FFTextStream(anotherStream), headerRead(false), timesystem(TimeSystem::GPS) {}
+
+      /** Common constructor.
+       *
+       * @param fn the RINEX file to open
+       * @param mode how to open \a fn.
+       */
       Rinex3ObsStream( const char* fn,
                        std::ios::openmode mode = std::ios::in );
 
