@@ -71,7 +71,9 @@ namespace gpstk
       Rinex3ObsStream()
          : headerRead(false), timesystem(TimeSystem::GPS)
             {};
-
+            
+    Rinex3ObsStream(std::basic_iostream<char>& anotherStream) 
+    : FFTextStream(anotherStream), headerRead(false), timesystem(TimeSystem::GPS) {}
 
       /** Common constructor.
        *
