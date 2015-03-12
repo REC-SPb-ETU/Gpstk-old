@@ -2036,6 +2036,9 @@ namespace gpstk
       tsys  =          line.substr(48,  3) ;
 
       ts.fromString(tsys);
+      if(ts == TimeSystem::Unknown) {
+        ts = TimeSystem::GPS;
+      }
 
       return CivilTime(year, month, day, hour, min, sec, ts);
    } // end parseTime
