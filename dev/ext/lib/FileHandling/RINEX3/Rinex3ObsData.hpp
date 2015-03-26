@@ -61,10 +61,11 @@ namespace gpstk
    #define GPSTK_RINEXDATUM
    struct RinexDatum
    {
-      RinexDatum() : data(0), lli(0), ssi(0) {} ///< constructor
+      RinexDatum() : data(0), lli(0), ssi(0), isEmpty(false) {} ///< constructor
       double data;  ///< The actual data point.
       short lli;    ///< See the RINEX Spec. for an explanation.
       short ssi;    ///< See the RINEX Spec. for an explanation.
+      bool isEmpty;
    };
    #endif // GPSTK_RINEXDATUM
 

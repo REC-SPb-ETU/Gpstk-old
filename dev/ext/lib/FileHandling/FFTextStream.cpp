@@ -1,6 +1,9 @@
 #include "FFTextStream.hpp"
 
+#include <iostream>
+
 using namespace gpstk;
+using namespace std;
 
 // the reason for checking ffs.eof() in the try AND catch block is
 // because if the user enabled exceptions on the stream with exceptions()
@@ -25,7 +28,6 @@ void FFTextStream::formattedGetLine( std::string& line,
      getline(templine, MAX_LINE_LENGTH);
      lineNumber++;
      //check if line was longer than 256 characters, if so error
-
      if(fail() && !eof())
      {
         FFStreamError err("Line too long");
@@ -92,7 +94,7 @@ void FFTextStream::tryFFStreamGet(FFData& rec)
 
 }
 
-void FFTextStream::tryFFStreamPut(const FFData& rec) 
+void FFTextStream::tryFFStreamPut(const FFData& rec)
   throw(FFStreamError, gpstk::StringUtils::StringException) {
 
   unsigned int initialLineNumber = lineNumber;
