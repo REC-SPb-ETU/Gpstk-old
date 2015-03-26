@@ -57,6 +57,19 @@ namespace gpstk
    /** @addtogroup RinexObs */
    //@{
 
+      /// A structure used to store a single RINEX Data point.
+   #ifndef GPSTK_RINEXDATUM
+   #define GPSTK_RINEXDATUM
+   struct RinexDatum
+   {
+      RinexDatum() : data(0), lli(0), ssi(0), isEmpty(false) {}
+      double data;  ///< The actual data point.
+      short lli;    ///< See the RINEX Spec. for an explanation.
+      short ssi;    ///< See the RINEX Spec. for an explanation.
+      bool isEmpty;
+   };
+   #endif // GPSTK_RINEXDATUM
+
       /**
        * This class models a RINEX Observation Data Record.
        *

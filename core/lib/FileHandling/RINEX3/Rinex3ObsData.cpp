@@ -15,7 +15,7 @@
 //  You should have received a copy of the GNU Lesser General Public
 //  License along with GPSTk; if not, write to the Free Software Foundation,
 //  Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110, USA
-//  
+//
 //  Copyright 2004, The University of Texas at Austin
 //
 //============================================================================
@@ -23,13 +23,13 @@
 //============================================================================
 //
 //This software developed by Applied Research Laboratories at the University of
-//Texas at Austin, under contract to an agency or agencies within the U.S. 
+//Texas at Austin, under contract to an agency or agencies within the U.S.
 //Department of Defense. The U.S. Government retains all rights to use,
-//duplicate, distribute, disclose, or release this software. 
+//duplicate, distribute, disclose, or release this software.
 //
-//Pursuant to DoD Directive 523024 
+//Pursuant to DoD Directive 523024
 //
-// DISTRIBUTION STATEMENT A: This software has been approved for public 
+// DISTRIBUTION STATEMENT A: This software has been approved for public
 //                           release, distribution is unlimited.
 //
 //=============================================================================
@@ -45,6 +45,7 @@
 #include "RinexObsID.hpp"
 #include "Rinex3ObsStream.hpp"
 #include "Rinex3ObsData.hpp"
+#include <iostream>
 
 using namespace gpstk::StringUtils;
 using namespace std;
@@ -536,9 +537,17 @@ namespace gpstk
                   // does this R2 OT map into a valid R3 ObsID?
                string R2ot(strm.header.R2ObsTypes[ndx]);
                string R3ot(strm.header.mapSysR2toR3ObsID[satsys][R2ot].asString());
-               if(R3ot != string("   "))
-               {
-                  RinexDatum tempData(line.substr(line_ndx*16, 16));
+
+	       if(R3ot != string("   ")) {
+                  RinexDatum tempData;
+                  string token = line.substr(line_ndx*16,14);
+                  if(token.find_first_not_of(' ') == std::string::npos) {
+                    tempData.isEmpty = true;
+                  } else {
+                    tempData.data = asDouble(line.substr(line_ndx*16,   14));
+                    tempData.lli =     asInt(line.substr(line_ndx*16+14, 1));
+                    tempData.ssi =     asInt(line.substr(line_ndx*16+15, 1));
+                  }
                   data.push_back(tempData);
                }
             }

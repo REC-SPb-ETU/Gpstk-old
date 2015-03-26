@@ -1025,15 +1025,18 @@ namespace gpstk
 
 
          /// Default constructor.
-      gnssRinex() {};
+      gnssRinex() {
+      };
 
 
          /** Explicit constructor from parent class
           *
           * @param gds      gnssSatTypeValue to build this gnssRinex from.
           */
-      gnssRinex(const gnssSatTypeValue& gds)
-      { header = gds.header; body = gds.body; };
+      inline gnssRinex(const gnssSatTypeValue& gds) { 
+          header = gds.header; 
+          body = gds.body; 
+      };
 
 
          /// Returns a gnssRinex with only this satellite.
