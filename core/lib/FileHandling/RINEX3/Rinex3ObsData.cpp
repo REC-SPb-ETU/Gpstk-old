@@ -173,7 +173,7 @@ namespace gpstk
 
                   // now find index of that data from R3 header
                const vector<RinexObsID>& vecData(strm.header.mapObsTypes[sys]);
-
+               
                vector<RinexObsID>::const_iterator jt;
                jt = find(vecData.begin(), vecData.end(), obsid);
 
@@ -190,17 +190,20 @@ namespace gpstk
                   strm.lineNumber++;
                   line = string("");
                }
-
-                  // write the line
-               if (ind == -1)
-               {
-                  RinexDatum empty;
-                  line += empty.asString();
+              
+               if(ind == -1 || itr->second[ind].isEmpty) {
+                 line += string(14 + 1 + 3, ' ');
+               } else {
+                    // write the line
+                 line += rightJustify(asString(            // double 14.3
+                            ( ind == -1 ? 0.0 : itr->second[ind].data),3),14 );
                }
-               else
-               {
-                  line += itr->second[ind].asString();
-               }
+               line += (ind == -1 || itr->second[ind].lli == 0)
+                       ? string(1, ' ')
+                       : rightJustify(asString<short>(itr->second[ind].lli),1);
+               line += (ind == -1 || itr->second[ind].ssi == 0)
+                       ? string(1, ' ')
+                       : rightJustify(asString<short>(itr->second[ind].ssi),1);
                obsWritten++;
 
             }  // End of 'for( i=0; i<strm.header.R2ObsTypes.size(); i++ )'
@@ -222,7 +225,7 @@ namespace gpstk
        *                obtained from corresponding RINEX Observation Header
        *                using method 'Rinex3ObsHeader::getObsIndex()'.
        */
-   RinexDatum Rinex3ObsData::getObs( const SatID& sat, int index ) const
+   Rinex3Datum Rinex3ObsData::getObs( const SatID& sat, int index ) const
       throw(InvalidRequest)
    {
 
@@ -240,7 +243,7 @@ namespace gpstk
       }
 
          // Extract a copy of the data vector
-      vector<RinexDatum> vecData(it->second);
+      vector<Rinex3Datum> vecData(it->second);
 
          // Return the corresponding data
       return vecData[index];
@@ -327,9 +330,19 @@ namespace gpstk
          {
             line = itr->first.toString();
 
-            for(size_t i=0; i < itr->second.size(); i++)
-            {
-               line += itr->second[i].asString();
+            for(size_t i=0; i < itr->second.size(); i++) {
+               Rinex3Datum thisData = itr->second[i];
+               line += rightJustify(asString(thisData.data,3),14);
+
+               if(thisData.lli == 0)
+                  line += string(1, ' ');
+               else
+                  line += rightJustify(asString<short>(thisData.lli),1);
+
+               if(thisData.ssi == 0)
+                  line += string(1, ' ');
+               else
+                  line += rightJustify(asString<short>(thisData.ssi),1);
             }
                // write the data line out
             strm << line << endl;
@@ -538,8 +551,8 @@ namespace gpstk
                string R2ot(strm.header.R2ObsTypes[ndx]);
                string R3ot(strm.header.mapSysR2toR3ObsID[satsys][R2ot].asString());
 
-	       if(R3ot != string("   ")) {
-                  RinexDatum tempData;
+               if(R3ot != string("   ")) {
+                  Rinex3Datum tempData;
                   string token = line.substr(line_ndx*16,14);
                   if(token.find_first_not_of(' ') == std::string::npos) {
                     tempData.isEmpty = true;
@@ -641,7 +654,7 @@ namespace gpstk
       if(epochFlag == 0 || epochFlag == 1 || epochFlag == 6)
       {
          vector<RinexSatID> satIndex(numSVs);
-         map<RinexSatID, vector<RinexDatum> > tempDataMap;
+         map<RinexSatID, vector<Rinex3Datum> > tempDataMap;
 
          for(int isv = 0; isv < numSVs; isv++)
          {
@@ -674,12 +687,16 @@ namespace gpstk
             if(line.size() < minSize)
                line += string(minSize-line.size(), ' ');
 
-               // get the data (# entries in ObsType map of maps from header)
-            vector<RinexDatum> data;
-            for(int i = 0; i < size; i++)
-            {
+            // get the data (# entries in ObsType map of maps from header)
+            vector<Rinex3Datum> data;
+            for(int i = 0; i < size; i++) {
                size_t pos = 3 + 16*i;
-               RinexDatum tempData(line.substr(pos,16));
+               Rinex3Datum tempData;
+               tempData.data = asDouble(line.substr(pos   , 14));
+               if( line.size() > pos+14 )
+                  tempData.lli  = asInt( line.substr(pos+14,  1));
+               if( line.size() > pos+15 )
+                  tempData.ssi  = asInt( line.substr(pos+15,  1));
                data.push_back(tempData);
             }
             obs[satIndex[isv]] = data;
