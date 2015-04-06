@@ -1,5 +1,5 @@
 # Minimum Required CMake Version
-cmake_minimum_required(VERSION 2.8.4)
+cmake_minimum_required(VERSION 2.8.5)
 
 # Project Name
 project (gpstk)
