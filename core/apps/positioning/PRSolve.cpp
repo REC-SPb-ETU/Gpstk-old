@@ -69,6 +69,7 @@
 #include "Rinex3ObsStream.hpp"
 #include "Rinex3ObsHeader.hpp"
 #include "Rinex3ObsData.hpp"
+#include "Rinex3Datum.h"
 
 #include "Rinex3NavBase.hpp"
 #include "Rinex3NavHeader.hpp"
@@ -388,7 +389,7 @@ public:
    // compute the actual datum, for the given satellite, given the RinexObsData vector
    // remember which ObsIDs were actually used, in usedobsids
    // return true if the data could be computed
-   bool ComputeData(const RinexSatID& sat, const vector<RinexDatum>& vrd)
+   bool ComputeData(const RinexSatID& sat, const vector<Rinex3Datum>& vrd)
    {
       usedobsids.clear();
       RawPR.clear();
@@ -517,7 +518,7 @@ public:
    // indicating whether there is sufficient good data.
    void CollectData(const RinexSatID& s,
                     const double& elev, const double& ER,
-                    const vector<RinexDatum>& v) throw();
+                    const vector<Rinex3Datum>& v) throw();
 
    // Compute a solution for the given epoch; call after CollectData()
    // same return value as RAIMCompute()
@@ -1413,7 +1414,7 @@ try {
          Rinex3ObsData::DataMap::iterator it;
          for(it=Rdata.obs.begin(); it!=Rdata.obs.end(); ++it) {
             sat = it->first;
-            vector<RinexDatum>& vrdata(it->second);
+            vector<Rinex3Datum>& vrdata(it->second);
             string sys(asString(sat.systemChar()));
 
             // is this system excluded?
@@ -2325,7 +2326,7 @@ void SolutionObject::EpochReset(void) throw()
 //------------------------------------------------------------------------------------
 void SolutionObject::CollectData(const RinexSatID& sat,
                                  const double& elev, const double& ER,
-                                 const vector<RinexDatum>& vrd)
+                                 const vector<Rinex3Datum>& vrd)
    throw()
 {
    if(!isValid) return;

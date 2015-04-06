@@ -104,7 +104,7 @@ namespace gpstk
             itr++;
          }
 
-            // add clock offset
+         // add clock offset
          if( rod.clockOffset != 0.0 )
          {
             line += string(68 - line.size(), ' ');
@@ -150,68 +150,46 @@ namespace gpstk
       else if( rod.epochFlag == 0 || rod.epochFlag == 1 || rod.epochFlag == 6 )
       {
          size_t i;
-         const int maxObsPerLine(5);
-
-            // loop over satellites in R3 obs data
-         for( itr = rod.obs.begin(); itr != rod.obs.end(); ++itr )
-         {
-
-            RinexSatID sat(itr->first);               // current satellite
-            string sys(string(1,sat.systemChar()));   // system
-            itr = rod.obs.find(sat);           // get data vector to be written
-            int obsWritten(0);
+         static const int MAX_OBS_PER_LINE = 5;
+         
+         for(Rinex3ObsData::DataMap::const_iterator it = rod.obs.begin(); 
+             it != rod.obs.end(); ++it
+         ) {
+            size_t obsWritten = 0;
             line = string("");
 
-               // loop over R2 obstypes
-            for( i=0; i<strm.header.R2ObsTypes.size(); i++ )
-            {
-
-                  // get the R3 obs ID from the map
-               RinexObsID obsid;
-               obsid =
-                  strm.header.mapSysR2toR3ObsID[sys][strm.header.R2ObsTypes[i]];
-
-                  // now find index of that data from R3 header
-               const vector<RinexObsID>& vecData(strm.header.mapObsTypes[sys]);
-               
-               vector<RinexObsID>::const_iterator jt;
-               jt = find(vecData.begin(), vecData.end(), obsid);
-
-                  // index into vecData
-               int ind(-1);
-
-               if( jt != vecData.end() )
-                  ind = jt-vecData.begin();
-
-                  // need a continuation line?
-               if( obsWritten != 0 && (obsWritten % maxObsPerLine) == 0 )
-               {
+            for(vector<Rinex3Datum>::const_iterator jt = it->second.begin();
+                jt != it->second.end(); ++jt
+            ) {
+                if(obsWritten == MAX_OBS_PER_LINE) {
                   strm << line << endl;
                   strm.lineNumber++;
                   line = string("");
-               }
-              
-               if(ind == -1 || itr->second[ind].isEmpty) {
-                 line += string(14 + 1 + 3, ' ');
-               } else {
-                    // write the line
-                 line += rightJustify(asString(            // double 14.3
-                            ( ind == -1 ? 0.0 : itr->second[ind].data),3),14 );
-               }
-               line += (ind == -1 || itr->second[ind].lli == 0)
-                       ? string(1, ' ')
-                       : rightJustify(asString<short>(itr->second[ind].lli),1);
-               line += (ind == -1 || itr->second[ind].ssi == 0)
-                       ? string(1, ' ')
-                       : rightJustify(asString<short>(itr->second[ind].ssi),1);
-               obsWritten++;
-
-            }  // End of 'for( i=0; i<strm.header.R2ObsTypes.size(); i++ )'
-
+                  obsWritten = 0;
+                }
+                if(jt->isEmpty) {
+                  line += string(14 + 1 + 3 + 2, ' ');
+                } else {
+                  line += rightJustify(
+                    asString(jt->data, 3), 14
+                  );
+                  if(jt->lli != 0) {
+                    line += rightJustify(asString<short>(jt->lli), 1);
+                  } else {
+                    line += " ";
+                  }
+                  if(jt->ssi != 0) {
+                    line += rightJustify(asString<short>(jt->ssi), 1);
+                  } else {
+                    line += " ";
+                  }
+                }
+                obsWritten++;
+            }
             strm << line << endl;
             strm.lineNumber++;
 
-         }  // End of 'for( itr = rod.obs.begin(); itr != rod.obs.end();...'
+         } 
 
       }  // Ebf of 'else if( rod.epochFlag == 0 || rod.epochFlag == 1 || ...'
 
