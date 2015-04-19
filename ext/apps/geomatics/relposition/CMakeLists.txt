@@ -24,7 +24,12 @@ target_link_libraries(baselib gpstk)
 
 add_executable(DDBase DDBase.cpp)
 target_link_libraries(DDBase baselib)
+<<<<<<< HEAD:ext/apps/geomatics/relposition/CMakeLists.txt
 install (TARGETS DDBase DESTINATION "${CMAKE_INSTALL_BINDIR}")
+=======
+install (TARGETS DDBase DESTINATION bin COMPONENT ${TOOLS_COMPONENT})
+add_test(DDBaseTest DDBase)
+>>>>>>> Component-aware install configuration,:dev/ext/apps/geomatics/relposition/CMakeLists.txt
 
 
 

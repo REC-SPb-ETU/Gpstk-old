@@ -3,6 +3,7 @@ cmake_minimum_required(VERSION 2.8.5)
 
 # Project Name
 project (gpstk)
+set(PROJECT_VERSION 2.3.2)
 
 #----------------------------------------
 # System Variables
@@ -29,7 +30,7 @@ option (CORE_ONLY OFF)
 #                  - Default is False
 #----------------------------------------
 
-option (TEST_SWITCH OFF)
+option (TEST_SWITCH "Build unit tests" OFF)
 
 #----------------------------------------
 # Set Compiler options
@@ -185,11 +186,16 @@ endif()
 # Install the gpstk library and core/ext headers
 #----------------------------------------
 
-install (TARGETS gpstk DESTINATION lib)
+# Component names for separate distribution in rpms, debs etc.
+set(TOOLS_COMPONENT tools)
+set(LIBRARIES_COMPONENT lib)
+set(HEADERS_COMPONENT devel)
+
+install (TARGETS gpstk DESTINATION lib COMPONENT ${LIBRARIES_COMPONENT})
 if (CORE_ONLY)
-  install (FILES ${CORE_HDRS} ${CORE_HDRS2} DESTINATION include/gpstk )
+  install (FILES ${CORE_HDRS} ${CORE_HDRS2} DESTINATION include/gpstk COMPONENT ${HEADERS_COMPONENT})
 else ()
-  install (FILES ${CORE_HDRS} ${CORE_HDRS2} ${EXT_HDRS} ${EXT_HDRS2} DESTINATION include/gpstk )
+  install (FILES ${CORE_HDRS} ${CORE_HDRS2} ${EXT_HDRS} ${EXT_HDRS2} DESTINATION include/gpstk COMPONENT ${HEADERS_COMPONENT})
 endif ()
 
 #----------------------------------------
@@ -204,24 +210,50 @@ if (TEST_SWITCH)
 endif()
 
 
-#----------------------------------------
-# Experimental stuff to have cmake build debs for us
-# To use this, run "make package"
-#----------------------------------------
-SET(CPACK_PACKAGE_NAME "gpstk")
-SET(CPACK_PACKAGE_DESCRIPTION_SUMMARY "GPSTk libraries and applications for GNSS processing.")
+### FOR PACKAGING in RPM, TGZ...###############################################################################
+set(CPACK_PACKAGE_VERSION ${PROJECT_VERSION})
+set(CPACK_PACKAGE_NAME ${PROJECT_NAME})
+set(CPACK_PACKAGE_RELEASE 1)
+set(CPACK_PACKAGE_DESCRIPTION_SUMMARY "GPSTk libraries and applications for GNSS processing")
 SET(CPACK_PACKAGE_VENDOR "ARL:UT SGL")
 SET(CPACK_PACKAGE_CONTACT "Bryan Parsons")
 SET(CPACK_PACKAGE_DESCRIPTION_FILE "${CMAKE_CURRENT_SOURCE_DIR}/README")
-SET(CPACK_PACKAGE_VERSION_MAJOR "2")
-SET(CPACK_PACKAGE_VERSION_MINOR "3")
-SET(CPACK_PACKAGE_VERSION_PATCH "2")
 SET(CPACK_INCLUDE_TOPLEVEL_DIRECTORY "OFF")
+set(CPACK_PACKAGE_FILE_NAME "${CPACK_PACKAGE_NAME}-${CPACK_PACKAGE_VERSION}-${CPACK_PACKAGE_RELEASE}")
+set(DEPLOY_PACKAGE_FILE_NAME "${CPACK_PACKAGE_FILE_NAME}")
 
-#SET(CPACK_DEBIAN_PACKAGE_DEPENDS "libc6 (>= 2.13)")
-#SET(CPACK_DEBIAN_SECTION "stable")
-#SET(CPACK_DEBIAN_PACKAGE_SECTION "science")
+# TGZ specific
+set(CPACK_ARCHIVE_COMPONENT_INSTALL ON)
 
-SET(CPACK_GENERATOR "RPM")
-set(CPACK_RPM_POST_INSTALL_SCRIPT_FILE "${CMAKE_CURRENT_SOURCE_DIR}/post_install_script.sh")
+# RPM specific
+set(CPACK_RPM_COMPONENT_INSTALL ON)
+set(CPACK_RPM_POST_INSTALL_SCRIPT_FILE "${CMAKE_CURRENT_SOURCE_DIR}/install/post_install_script.sh")
+set(CPACK_RPM_POST_UNINSTALL_SCRIPT_FILE "${CMAKE_CURRENT_SOURCE_DIR}/install/post_uninstall_script.sh")
+#set(CPACK_RPM_CHANGELOG_FILE ${CHANGELOG_INCLUDE})
+set(CPACK_RPM_PACKAGE_LICENSE GPL)
+set(CPACK_RPM_PACKAGE_GROUP "System Environment/Base")
+set(CPACK_RPM_EXCLUDE_FROM_AUTO_FILELIST_ADDITION ${CPACK_PACKAGING_INSTALL_PREFIX})
+set(CPACK_RPM_EXCLUDE_FROM_AUTO_FILELIST_ADDITION /usr/local)
+set(CPACK_RPM_${TOOLS_COMPONENT}_PACKAGE_REQUIRES "${LIBRARIES_COMPONENT} = ${PROJECT_VERSION}")
+set(CPACK_RPM_${HEADERS_COMPONENT}_PACKAGE_REQUIRES "${LIBRARIES_COMPONENT} = ${PROJECT_VERSION}")
+
+# DEB specific
+set(CPACK_DEBIAN_PACKAGE_DEPENDS "libc6 (>= 2.13)")
+set(CPACK_DEBIAN_PACKAGE_SECTION "science")
+
+# Components grouping for Mac OS X and Windows installers
+set(CPACK_COMPONENT_${TOOLS_COMPONENT}_GROUP "Applications")
+set(CPACK_COMPONENT_${LIBRARIES_COMPONENT}_GROUP "Runtime")
+set(CPACK_COMPONENT_${HEADERS_COMPONENT}_GROUP "Development")
+set(CPACK_COMPONENT_${TOOLS_COMPONENT}_DISPLAY_NAME "Applications")
+set(CPACK_COMPONENT_${LIBRARIES_COMPONENT}_DISPLAY_NAME "Libraries")
+set(CPACK_COMPONENT_${HEADERS_COMPONENT}_DISPLAY_NAME "C++ Headers")
+
+set(CPACK_COMPONENT_${HEADERS_COMPONENT}_DEPENDS ${LIBRARIES_COMPONENT})
+set(CPACK_COMPONENT_${TOOLS_COMPONENT}_DEPENDS ${LIBRARIES_COMPONENT})
+
+set(CPACK_COMPONENT_GROUP_DEVELOPMENT_DESCRIPTION "All of the tools you'll ever need to develop software for GNSS processing")
+set(CPACK_COMPONENT_GROUP_RUNTIME_DESCRIPTION "Only GPSTk library for runtime")
+set(CPACK_COMPONENT_GROUP_APPLICATIONS_DESCRIPTION "Converters and GNSS tools")
+
 INCLUDE(CPack)
