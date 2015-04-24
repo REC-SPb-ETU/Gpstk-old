@@ -542,7 +542,9 @@ namespace gpstk
                   data.push_back(tempData);
                }
             }
-            rod.obs[sat] = data;
+            if(rod.obs.find(sat) == rod.obs.end()) {
+              rod.obs.insert(make_pair(sat, data));
+            }
 
          }  // end loop over sats to read obs data
       }
@@ -677,7 +679,9 @@ namespace gpstk
                   tempData.ssi  = asInt( line.substr(pos+15,  1));
                data.push_back(tempData);
             }
-            obs[satIndex[isv]] = data;
+            if(obs.find(satIndex[isv]) == obs.end()) {
+              obs.insert(make_pair(satIndex[isv], data));
+            }
          }
       }
 
