@@ -1,5 +1,6 @@
 # tests/CMakeLists.txt
 
+<<<<<<< HEAD:ext/tests/CMakeLists.txt
 # application testing
 add_subdirectory (difftools)
 add_subdirectory (mergetools)
@@ -8,6 +9,9 @@ add_subdirectory (Rinextools)
 add_subdirectory (time)
 
 #add_subdirectory (ANSITime)
+=======
+add_subdirectory (ANSITime)
+>>>>>>> Added the first test package in for CTest. Moreover CppUnit requirement:dev/tests/CMakeLists.txt
 #add_subdirectory (BinUtils)
 #add_subdirectory (CivilTime)
 #add_subdirectory (CommonTime)
@@ -33,5 +37,4 @@ add_subdirectory (time)
 #add_subdirectory (Vector)
 #add_subdirectory (YDSTime)
 #add_subdirectory (Yuma)
-
 
