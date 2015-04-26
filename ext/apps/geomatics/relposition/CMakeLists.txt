@@ -28,8 +28,12 @@ target_link_libraries(DDBase baselib)
 install (TARGETS DDBase DESTINATION "${CMAKE_INSTALL_BINDIR}")
 =======
 install (TARGETS DDBase DESTINATION bin COMPONENT ${TOOLS_COMPONENT})
+<<<<<<< HEAD:ext/apps/geomatics/relposition/CMakeLists.txt
 add_test(DDBaseTest DDBase)
 >>>>>>> Component-aware install configuration,:dev/ext/apps/geomatics/relposition/CMakeLists.txt
+=======
+
+>>>>>>> There is no tests in "ext" package - thats why "add_test" was an error:dev/ext/apps/geomatics/relposition/CMakeLists.txt
 
 
 
