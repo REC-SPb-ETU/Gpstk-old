@@ -5,8 +5,10 @@ MANIFEST
 dist
 =======
 dist
+*.cmake
 CMakeCache.txt
 CMakeFiles/
+_CPack_Packages/
 Makefile
 compile_commands.json
 core/CMakeFiles/
