@@ -151,7 +151,7 @@ namespace gpstk
          /// number for the type of header data you want to write.
       virtual void reallyPutRecord(FFStream& s) const
          throw( std::exception, FFStreamError,
-                gpstk::StringUtils::StringException );
+                gpstk::StringUtils::StringException, std::bad_cast);
 
 
          /** This functions obtains a RINEX 3 Observation record from the given

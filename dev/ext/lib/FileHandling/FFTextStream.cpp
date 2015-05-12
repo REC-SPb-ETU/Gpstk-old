@@ -95,7 +95,7 @@ void FFTextStream::tryFFStreamGet(FFData& rec)
 }
 
 void FFTextStream::tryFFStreamPut(const FFData& rec)
-  throw(FFStreamError, gpstk::StringUtils::StringException) {
+  throw(FFStreamError, gpstk::StringUtils::StringException,std::bad_cast) {
 
   unsigned int initialLineNumber = lineNumber;
 

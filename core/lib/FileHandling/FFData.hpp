@@ -93,7 +93,7 @@ namespace gpstk
           * @param s a FFStream-based stream
           */
       void putRecord(FFStream& s) const 
-         throw(FFStreamError, gpstk::StringUtils::StringException);
+         throw(FFStreamError, gpstk::StringUtils::StringException, std::bad_cast);
 
          /**
           * Retrieve a "record" from the given stream.

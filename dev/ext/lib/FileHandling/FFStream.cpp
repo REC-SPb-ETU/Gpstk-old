@@ -232,7 +232,7 @@ namespace gpstk
   // etc) to be retained.
 
   void FFStream::tryFFStreamPut(const FFData& rec)
-  throw (FFStreamError, gpstk::StringUtils::StringException)
+  throw (FFStreamError, gpstk::StringUtils::StringException, std::bad_cast)
   {
     // Mark where we start in case there is an error.
     long initialPosition = tellg();

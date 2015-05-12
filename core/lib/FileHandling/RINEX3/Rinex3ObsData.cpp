@@ -54,7 +54,7 @@ namespace gpstk
 {
    void reallyPutRecordVer2( Rinex3ObsStream& strm,
                              const Rinex3ObsData& rod )
-      throw(FFStreamError, StringException)
+      throw(FFStreamError, StringException, std::bad_cast)
    {
 
          // is there anything to write?
@@ -260,7 +260,7 @@ namespace gpstk
 
 
    void Rinex3ObsData::reallyPutRecord(FFStream& ffs) const
-      throw(std::exception, FFStreamError, StringException)
+      throw(std::exception, FFStreamError, StringException, std::bad_cast)
    {
          // is there anything to write?
       if( (epochFlag == 0 || epochFlag == 1 || epochFlag == 6)

@@ -146,7 +146,7 @@ namespace gpstk
 
          /// calls FFStream::tryFFStreamPut and adds line number information
       virtual void tryFFStreamPut(const FFData& rec)
-         throw(FFStreamError, gpstk::StringUtils::StringException);
+         throw(FFStreamError, gpstk::StringUtils::StringException, std::bad_cast);
 
    }; // End of class 'FFTextStream'
 

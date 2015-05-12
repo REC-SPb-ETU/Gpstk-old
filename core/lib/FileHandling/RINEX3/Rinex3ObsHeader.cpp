@@ -297,9 +297,9 @@ namespace gpstk
    }  // end numberHeaderRecordsToBeWritten
 
 
-      // This function writes all valid header records.
-   void Rinex3ObsHeader::writeHeaderRecords(FFStream& ffs) const
-      throw(FFStreamError, StringException)
+   // This function writes all valid header records.
+   void Rinex3ObsHeader::WriteHeaderRecords(FFStream& ffs) const
+    throw(FFStreamError, gpstk::StringUtils::StringException, std::bad_cast)
    {
       Rinex3ObsStream& strm = dynamic_cast<Rinex3ObsStream&>(ffs);
       string line;

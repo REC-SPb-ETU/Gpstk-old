@@ -45,7 +45,7 @@
 namespace gpstk
 {
    void FFData::putRecord(FFStream& s) const 
-      throw(FFStreamError, gpstk::StringUtils::StringException)
+      throw(FFStreamError, gpstk::StringUtils::StringException,std::bad_cast)
    { 
       s.tryFFStreamPut(*this); 
    }

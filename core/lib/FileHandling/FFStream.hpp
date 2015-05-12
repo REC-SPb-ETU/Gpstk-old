@@ -218,7 +218,7 @@ namespace gpstk
          /// Encapsulates shared try/catch blocks for all file types
          /// to hide std::exception.
       virtual void tryFFStreamPut(const FFData& rec)
-         throw(FFStreamError, gpstk::StringUtils::StringException);
+         throw(FFStreamError, gpstk::StringUtils::StringException,std::bad_cast);
 
    private:
          /// Initialize internal data structures according to file name & mode
