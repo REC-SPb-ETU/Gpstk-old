@@ -54,7 +54,7 @@ namespace gpstk
 
   FFStream::FFStream(std::basic_iostream<char>& anotherStream)
   {
-    rdbuf(anotherStream.rdbuf());
+    this->init(anotherStream.rdbuf());
     recordNumber = 0;
     clear();
   }
