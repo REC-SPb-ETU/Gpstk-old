@@ -216,7 +216,7 @@ endif()
 ### FOR PACKAGING in RPM, TGZ...###############################################################################
 set(CPACK_PACKAGE_VERSION ${PROJECT_VERSION})
 set(CPACK_PACKAGE_NAME ${PROJECT_NAME})
-set(CPACK_PACKAGE_RELEASE 2)
+set(CPACK_PACKAGE_RELEASE 3)
 set(CPACK_PACKAGE_DESCRIPTION_SUMMARY "GPSTk libraries and applications for GNSS processing")
 SET(CPACK_PACKAGE_VENDOR "ARL:UT SGL")
 SET(CPACK_PACKAGE_CONTACT "Bryan Parsons")
