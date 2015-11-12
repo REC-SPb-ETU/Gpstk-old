@@ -47,6 +47,7 @@
 #include "TimeString.hpp"
 #include "GNSSconstants.hpp"
 #include "StringUtils.hpp"
+#include <assert.h>
 
 namespace gpstk
 {
@@ -74,6 +75,7 @@ namespace gpstk
 
       // clock
       Toc = rnd.Toc;
+      assert(Toc >= 0 && Toc < (FULLWEEK));
       af0 = rnd.af0;
       af1 = rnd.af1;
       af2 = rnd.af2;
@@ -110,6 +112,7 @@ namespace gpstk
       PRNID = sat.id;
 
       //Toc = static_cast<GPSWeekSecond>(oeptr->ctToe).getSOW();
+      Toc = 0.0;
       af0 = oeptr->af0;
       af1 = oeptr->af1;
       af2 = oeptr->af2;
@@ -139,6 +142,7 @@ namespace gpstk
       loadFrom(dynamic_cast<const OrbitEph*>(&gpseph));
 
       Toc = static_cast<GPSWeekSecond>(gpseph.ctToc).getSOW();
+      assert(Toc >= 0 && Toc < (FULLWEEK));
       Toe = static_cast<GPSWeekSecond>(gpseph.ctToe).getSOW();
       HOWtime = gpseph.HOWtime;
       weeknum = static_cast<GPSWeekSecond>(gpseph.transmitTime).getWeek();
@@ -163,6 +167,7 @@ namespace gpstk
       loadFrom(dynamic_cast<const OrbitEph*>(&galeph));
 
       Toc = static_cast<GALWeekSecond>(galeph.ctToc).getSOW();
+      assert(Toc >= 0 && Toc < (FULLWEEK));
       Toe = static_cast<GALWeekSecond>(galeph.ctToe).getSOW();
       HOWtime = galeph.HOWtime;
       weeknum = static_cast<GPSWeekSecond>(galeph.transmitTime).getWeek();
@@ -181,6 +186,7 @@ namespace gpstk
       loadFrom(dynamic_cast<const OrbitEph*>(&bdseph));
 
       Toc = static_cast<BDSWeekSecond>(bdseph.ctToc).getSOW();
+      assert(Toc >= 0 && Toc < (FULLWEEK));
       Toe = static_cast<BDSWeekSecond>(bdseph.ctToe).getSOW();
       HOWtime = bdseph.HOWtime;
       weeknum = static_cast<BDSWeekSecond>(bdseph.transmitTime).getWeek();
@@ -200,6 +206,7 @@ namespace gpstk
       loadFrom(dynamic_cast<const OrbitEph*>(&qzseph));
 
       Toc = static_cast<QZSWeekSecond>(qzseph.ctToc).getSOW();
+      assert(Toc >= 0 && Toc < (FULLWEEK));
       Toe = static_cast<QZSWeekSecond>(qzseph.ctToe).getSOW();
       HOWtime = qzseph.HOWtime;
       weeknum = static_cast<QZSWeekSecond>(qzseph.transmitTime).getWeek();
@@ -232,6 +239,7 @@ namespace gpstk
       time   = ee.getEpochTime();
 
       Toc     = ee.getToc();
+      assert(Toc >= 0 && Toc < (FULLWEEK));
       HOWtime = long(ee.getHOWTime(1));
       weeknum = ee.getFullWeek();
 
@@ -287,6 +295,8 @@ namespace gpstk
       PRNID  = gloe.getPRNID();
       sat    = RinexSatID(PRNID,SatID::systemGlonass);
       time   = gloe.getEpochTime();
+
+      Toc = 0.0;
 
          // GLONASS parameters
       TauN = gloe.getTauN();
@@ -1195,6 +1205,8 @@ namespace gpstk
          // TOC is the clock time
          GPSWeekSecond gws(time);         // sow is system-independent
          Toc = gws.sow;
+
+         assert(Toc >= 0 && Toc < (FULLWEEK));
 
          if(strm.header.version < 3) {    // Rinex 2.*
             if(satSys == "G") {
