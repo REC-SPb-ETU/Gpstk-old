@@ -15,7 +15,7 @@
 //  You should have received a copy of the GNU Lesser General Public
 //  License along with GPSTk; if not, write to the Free Software Foundation,
 //  Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110, USA
-//  
+//
 //  Copyright 2004, The University of Texas at Austin
 //
 //============================================================================
@@ -23,13 +23,13 @@
 //============================================================================
 //
 //This software developed by Applied Research Laboratories at the University of
-//Texas at Austin, under contract to an agency or agencies within the U.S. 
+//Texas at Austin, under contract to an agency or agencies within the U.S.
 //Department of Defense. The U.S. Government retains all rights to use,
-//duplicate, distribute, disclose, or release this software. 
+//duplicate, distribute, disclose, or release this software.
 //
-//Pursuant to DoD Directive 523024 
+//Pursuant to DoD Directive 523024
 //
-// DISTRIBUTION STATEMENT A: This software has been approved for public 
+// DISTRIBUTION STATEMENT A: This software has been approved for public
 //                           release, distribution is unlimited.
 //
 //=============================================================================
@@ -127,12 +127,7 @@ namespace gpstk
 
          /// Virtual destructor, close the stream etc.
       virtual ~FFStream();
-      
-         /**
-          * Default constructor
-          */
-      FFStream();
-      
+
          /** Construction from another stream for decoration
           *
           * @param anotherStream
@@ -181,7 +176,7 @@ namespace gpstk
 
          /// Check if the input stream is the kind of RinexObsStream
       static bool isFFStream(std::istream& i);
-      
+
       virtual void close();
       virtual bool is_open();
 
@@ -197,17 +192,17 @@ namespace gpstk
       std::string filename;
 
          //@}
-      
-      
+
+
 
          /// FFData is a friend so it can access the try* functions.
       friend class FFData;
 
 
    protected:
-     
+
       std::fstream fileStream; // used only in file system case;
-      
+
 
          /// Encapsulates shared try/catch blocks for all file types
          /// to hide std::exception.

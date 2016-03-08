@@ -151,8 +151,8 @@ namespace gpstk
       {
          size_t i;
          static const int MAX_OBS_PER_LINE = 5;
-         
-         for(Rinex3ObsData::DataMap::const_iterator it = rod.obs.begin(); 
+
+         for(Rinex3ObsData::DataMap::const_iterator it = rod.obs.begin();
              it != rod.obs.end(); ++it
          ) {
             size_t obsWritten = 0;
@@ -189,7 +189,7 @@ namespace gpstk
             strm << line << endl;
             strm.lineNumber++;
 
-         } 
+         }
 
       }  // Ebf of 'else if( rod.epochFlag == 0 || rod.epochFlag == 1 || ...'
 
@@ -235,7 +235,7 @@ namespace gpstk
        * @param type String representing the observation type.
        * @param hdr  RINEX Observation Header for current RINEX file.
        */
-   RinexDatum Rinex3ObsData::getObs( const SatID& sat, std::string type,
+   Rinex3Datum Rinex3ObsData::getObs( const SatID& sat, std::string type,
                                      const Rinex3ObsHeader& hdr ) const
       throw(InvalidRequest)
    {
@@ -507,7 +507,7 @@ namespace gpstk
          {
             sat = satIndex[isv];                   // sat for this data
             satsys = asString(sat.systemChar());   // system for this sat
-            vector<RinexDatum> data;
+            vector<Rinex3Datum> data;
                // loop over data in the line
             for(ndx=0, line_ndx=0; ndx < numObs; ndx++, line_ndx++)
             {

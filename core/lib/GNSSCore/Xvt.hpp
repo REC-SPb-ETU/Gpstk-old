@@ -15,7 +15,7 @@
 //  You should have received a copy of the GNU Lesser General Public
 //  License along with GPSTk; if not, write to the Free Software Foundation,
 //  Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110, USA
-//  
+//
 //  Copyright 2004, The University of Texas at Austin
 //
 //============================================================================
@@ -23,13 +23,13 @@
 //============================================================================
 //
 //This software developed by Applied Research Laboratories at the University of
-//Texas at Austin, under contract to an agency or agencies within the U.S. 
+//Texas at Austin, under contract to an agency or agencies within the U.S.
 //Department of Defense. The U.S. Government retains all rights to use,
-//duplicate, distribute, disclose, or release this software. 
+//duplicate, distribute, disclose, or release this software.
 //
-//Pursuant to DoD Directive 523024 
+//Pursuant to DoD Directive 523024
 //
-// DISTRIBUTION STATEMENT A: This software has been approved for public 
+// DISTRIBUTION STATEMENT A: This software has been approved for public
 //                           release, distribution is unlimited.
 //
 //=============================================================================
@@ -90,7 +90,6 @@ namespace gpstk
 
       /// Compute and return the relativity correction (-2R dot V/c^2) in seconds
       /// NB -2*dot(R,V)/(c*c) = -4.4428e-10(s/sqrt(m)) * ecc * sqrt(A(m)) * sinE
-      double computeRelativityCorrection(void);
       double computeRelativityCorrection(void) const;
 
       /// Given the position of a ground location, compute the range
@@ -100,7 +99,7 @@ namespace gpstk
       /// @param correction offset in meters (include any factors other
       /// than the SV clock correction and the relativity correction).
       /// @return Range in meters
-      double preciseRho(const Triple& rxPos, 
+      double preciseRho(const Triple& rxPos,
                         const EllipsoidModel& ellipsoid,
                         double correction = 0) const throw();
 

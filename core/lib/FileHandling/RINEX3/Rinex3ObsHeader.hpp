@@ -15,7 +15,7 @@
 //  You should have received a copy of the GNU Lesser General Public
 //  License along with GPSTk; if not, write to the Free Software Foundation,
 //  Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110, USA
-//  
+//
 //  Copyright 2004, The University of Texas at Austin
 //
 //============================================================================
@@ -23,13 +23,13 @@
 //============================================================================
 //
 //This software developed by Applied Research Laboratories at the University of
-//Texas at Austin, under contract to an agency or agencies within the U.S. 
+//Texas at Austin, under contract to an agency or agencies within the U.S.
 //Department of Defense. The U.S. Government retains all rights to use,
-//duplicate, distribute, disclose, or release this software. 
+//duplicate, distribute, disclose, or release this software.
 //
-//Pursuant to DoD Directive 523024 
+//Pursuant to DoD Directive 523024
 //
-// DISTRIBUTION STATEMENT A: This software has been approved for public 
+// DISTRIBUTION STATEMENT A: This software has been approved for public
 //                           release, distribution is unlimited.
 //
 //=============================================================================
@@ -226,7 +226,7 @@ namespace gpstk
          validLeapSeconds       = 0x20000000, ///< LEAP SECONDS
          validNumSats           = 0x40000000, ///< # OF SATELLITES
          validPrnObs            = 0x80000000, ///< PRN / # OF OBS
-   
+
             /// This mask is for all required valid fields - RINEX 2
          allValid2              = 0x001207CB,
 
@@ -238,7 +238,7 @@ namespace gpstk
          allValid301            = 0x041205AB, ///< RINEX 3.01
          allValid302            = 0x041205AB  ///< RINEX 3.02
       };
-   
+
 #ifndef SWIG // nested structs/classes not supported by SWIG
          /** RINEX 3 DCBS/PCVS info (for differential code bias and
           * phase center variations corr.) */
@@ -437,7 +437,7 @@ namespace gpstk
           * by reallyPutRecord for both Rinex3ObsHeader and
           * Rinex3ObsData. */
       void writeHeaderRecords(FFStream& s) const
-         throw(FFStreamError, gpstk::StringUtils::StringException);
+         throw(FFStreamError, gpstk::StringUtils::StringException, std::bad_cast);
 
          /// Return boolean : is this a valid Rinex header?
       bool isValid() const
@@ -446,7 +446,7 @@ namespace gpstk
          unsigned long allValid;
          if(     version < 3.00) allValid = allValid2;
          else if(version < 3.01) allValid = allValid30;
-         else if(version < 3.02) allValid = allValid301;  
+         else if(version < 3.02) allValid = allValid301;
          else                    allValid = allValid302;
          return ((valid & allValid) == allValid);
       }
@@ -494,7 +494,7 @@ namespace gpstk
 
       /// Helper methods
       /// The conversion between RINEX v2.11 to RINEX v3 observation
-      /// type is fraught with system-specific idiosyncracies.   These 
+      /// type is fraught with system-specific idiosyncracies.   These
       /// methods read the list of v2.11 obs types stored in R2ObsTypes
       /// and attempt to build a corresponding list of v3 observation
       /// types where appropriate.
